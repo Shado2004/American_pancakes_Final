@@ -9,7 +9,7 @@ const rootDir = path.join(__dirname, '..');
 const frontendDir = path.join(rootDir, 'frontend');
 const nodeModulesDir = path.join(frontendDir, 'node_modules');
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const useShell = process.platform === 'win32';
+const useShell = true;
 
 function hasCurrentFrontendDependencies() {
   const installedLockPath = path.join(nodeModulesDir, '.package-lock.json');
