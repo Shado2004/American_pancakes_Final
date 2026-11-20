@@ -119,6 +119,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               currency_symbol: '₹',
               timezone: 'Asia/Kolkata',
               language: 'en',
+              role: 'owner',
+              is_active: 1,
             },
           ],
         };
@@ -179,6 +181,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               currency_symbol: '₹',
               timezone: 'Asia/Kolkata',
               language: 'en',
+              role: 'owner',
+              is_active: 1,
             },
           ],
         };

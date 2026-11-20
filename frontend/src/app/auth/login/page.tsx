@@ -143,6 +143,7 @@ function LoginContent() {
     try {
       await login(email, password, rememberMe);
       toast.success(t('signInSuccess'));
+      window.location.replace('/pos');
     } catch (err: unknown) {
       if (err instanceof StorageUnavailableError) {
         // Server login succeeded but the session could not be persisted.
@@ -187,6 +188,7 @@ function LoginContent() {
     try {
       await pinLogin(selectedPinUser.id, pin, rememberMe);
       toast.success(t('signInSuccess'));
+      window.location.replace('/pos');
     } catch (err: unknown) {
       if (err instanceof StorageUnavailableError) {
         setPinError(t('storageUnavailable'));
