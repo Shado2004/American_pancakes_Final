@@ -40,7 +40,9 @@ if (index >= total) {
 
 const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
 const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-const testScript = pkg.scripts && pkg.scripts.test;
+const testScript =
+  (pkg.scripts && pkg.scripts['test:all-sequential']) ||
+  (pkg.scripts && pkg.scripts.test);
 if (typeof testScript !== 'string' || testScript.length === 0) {
   console.error('package.json has no "test" script to shard.');
   process.exit(2);
