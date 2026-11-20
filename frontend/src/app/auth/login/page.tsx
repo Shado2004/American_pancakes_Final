@@ -259,7 +259,11 @@ function LoginContent() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/logo.svg" alt="Flo" width={96} height={96} className="mx-auto mb-3" />
+          <img
+            src="/logo.png"
+            alt="The American Pancakes"
+            className="mx-auto mb-3 h-24 w-auto object-contain drop-shadow-sm transition-transform hover:scale-105"
+          />
           <p className="text-muted-foreground mt-2">{t('signInTitle')}</p>
         </div>
         {dbError && (

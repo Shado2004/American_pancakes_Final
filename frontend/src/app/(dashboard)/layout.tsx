@@ -11,6 +11,7 @@ import GlobalNotifications from '@/components/layout/GlobalNotifications';
 import TitleBar from '@/components/layout/TitleBar';
 import UpdateAvailableDialog from '@/components/updates/UpdateAvailableDialog';
 import ProductAnalyticsDialog from '@/components/analytics/ProductAnalyticsDialog';
+import NetworkStatusBanner from '@/components/layout/NetworkStatusBanner';
 import { usePrinterStatusSync } from '@/hooks/usePrinter';
 import { useReceiptSettingsSync } from '@/hooks/useReceiptSettingsSync';
 import { normalizePathname } from '@/lib/utils';
@@ -94,6 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           style={{ minHeight: 0 }}
         >
           <TitleBar />
+          <NetworkStatusBanner />
           <div className="flex min-h-0 flex-1 w-full overflow-hidden">
             <AppSidebar />
             <SidebarInset className="h-full min-h-0 overflow-hidden flex flex-col bg-transparent">

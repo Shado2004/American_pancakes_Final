@@ -9,6 +9,7 @@ import { showPrintLanguageLoadErrorsToast } from '@/lib/printer/warnings-toast';
 import { tenantCan } from '@/lib/permissions';
 import { normalizePathname } from '@/lib/utils';
 import type { Tenant } from '@/lib/types';
+import BrandedLoading from '@/components/ui/BrandedLoading';
 
 export const LANDING_PAGE_CANDIDATES = [
   ['pos.use', '/pos'],
@@ -202,14 +203,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (loading || needsSetup === null || needsSetup === true) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-muted">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-brand border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground text-sm">{t('loadingScreen')}</p>
-        </div>
-      </div>
-    );
+    return <BrandedLoading />;
   }
 
   if (isPublicPath) {

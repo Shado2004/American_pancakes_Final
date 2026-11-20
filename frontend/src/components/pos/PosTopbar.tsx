@@ -97,7 +97,14 @@ export default function PosTopbar({
     <div className="flex flex-col border-b bg-card shrink-0 px-3 py-2 sm:px-4 sm:py-2.5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-white border border-amber-200 shadow-xs overflow-hidden">
+              <img
+                src="/logo.png"
+                alt="The American Pancakes"
+                className="size-7 object-contain"
+              />
+            </div>
             <span className="text-base font-bold text-foreground tracking-tight">American Pancakes</span>
           </div>
         </div>
