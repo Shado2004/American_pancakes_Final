@@ -4,13 +4,15 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm install --ignore-scripts && npm run build
+    buildCommand: npm install --include=dev --ignore-scripts && npm run build
     startCommand: node dev-server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: ELECTRON_SKIP_BINARY_DOWNLOAD
+        value: '1'
       - key: JWT_SECRET
         generateValue: true
       - key: SESSION_SECRET
