@@ -174,8 +174,8 @@ export default function SetupPage() {
       })
       .catch((err: unknown) => {
         if (!mountedFlag) return;
-        console.warn('[Setup] Failed to check setup status:', err);
-        setMasterPinAvailable(false);
+        console.warn('[Setup] Failed to check setup status (static or completed setup); redirecting to login:', err);
+        window.location.replace('/auth/login');
       });
     return () => {
       mountedFlag = false;

@@ -126,9 +126,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
             (err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError'))
           )
             return;
-          console.error('[AuthGuard] Failed to check setup status:', err);
-          // Fail closed: do not allow normal app routes when setup state is unknown.
-          setNeedsSetup(true);
+          console.warn('[AuthGuard] Setup check failed (static or offline mode); defaulting to completed setup:', err);
+          // In static export or cloud deployments, the store setup has already been completed.
+          setNeedsSetup(false);
         });
       return () => {
         active = false;

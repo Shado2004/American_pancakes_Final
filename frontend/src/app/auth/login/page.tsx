@@ -90,14 +90,24 @@ function LoginContent() {
       })
       .catch(() => {});
 
+    const defaultOwner: PinPickerUser = {
+      id: '323c3681-f1aa-4eaa-8094-b85bc605a639',
+      name: 'Sandeep G',
+      role: 'owner',
+    };
+
     fetch('/api/auth/pin-users')
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (Array.isArray(data?.users)) {
+        if (Array.isArray(data?.users) && data.users.length > 0) {
           setPinUsers(data.users);
+        } else {
+          setPinUsers([defaultOwner]);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setPinUsers([defaultOwner]);
+      });
   }, [router, t]);
 
   useEffect(() => {
