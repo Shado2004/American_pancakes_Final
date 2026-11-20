@@ -94,9 +94,14 @@ export async function captureClientOperationFailure(input: {
   }
 }
 
-// Base URL derived from window.location.origin so LAN clients connect to host IP.
+// Base URL derived from NEXT_PUBLIC_API_URL or window.location.origin
 const api = axios.create({
-  baseURL: typeof window !== 'undefined' ? `${window.location.origin}/api` : '/api',
+  baseURL:
+    process.env.NEXT_PUBLIC_API_URL
+      ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '')}/api`
+      : typeof window !== 'undefined'
+        ? `${window.location.origin}/api`
+        : '/api',
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

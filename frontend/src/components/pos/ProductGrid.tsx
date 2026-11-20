@@ -516,7 +516,7 @@ export default function ProductGrid({
         className="flex-1 min-h-0 overflow-y-auto pb-20 md:pb-0"
       >
         <div
-          className={`grid gap-3 ${gridClassName ?? (sidebarOpen ? 'grid-cols-4' : 'grid-cols-5')}`}
+          className={gridClassName ?? "grid grid-cols-3 sm:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4"}
         >
           {filtered.map((product) => {
             const inCartQty = cartQuantities.get(product.id) || 0;
@@ -526,7 +526,7 @@ export default function ProductGrid({
               <div
                 key={product.id}
                 data-testid="pos-product-card"
-                className={`min-h-36 bg-card rounded-xl p-2.5 border transition-all text-start relative overflow-hidden flex flex-col justify-between ${
+                className={`min-h-28 sm:min-h-36 bg-card rounded-xl p-2 sm:p-2.5 border transition-all text-start relative overflow-hidden flex flex-col justify-between ${
                   inCartQty > 0
                     ? 'ring-2 ring-amber-500 border-amber-500 bg-amber-500/5 shadow-sm'
                     : 'border-border hover:border-brand/40 hover:shadow-md'
@@ -546,29 +546,29 @@ export default function ProductGrid({
                   {!!product.track_inventory && (
                     <>
                       {product.stock_quantity <= 0 ? (
-                        <span className="absolute top-2 start-2 bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm border border-red-200 dark:border-red-800/40 pointer-events-none">
+                        <span className="absolute top-1.5 start-1.5 sm:top-2 sm:start-2 bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full z-10 shadow-sm border border-red-200 dark:border-red-800/40 pointer-events-none">
                           {t('outOfStock')}
                         </span>
                       ) : product.stock_quantity <= (product.low_stock_threshold || 0) ? (
-                        <span className="absolute top-2 start-2 bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm border border-orange-200 dark:border-orange-800/40 pointer-events-none">
+                        <span className="absolute top-1.5 start-1.5 sm:top-2 sm:start-2 bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full z-10 shadow-sm border border-orange-200 dark:border-orange-800/40 pointer-events-none">
                           {t('lowStock')}
                         </span>
                       ) : null}
                     </>
                   )}
                   {inCartQty > 0 && (
-                    <span className="absolute top-0 end-0 bg-amber-500 text-white text-xs w-6 h-6 rounded-es-lg flex items-center justify-center font-bold z-10">
+                    <span className="absolute top-0 end-0 bg-amber-500 text-white text-[10px] sm:text-xs w-5 h-5 sm:w-6 sm:h-6 rounded-es-lg flex items-center justify-center font-bold z-10">
                       {inCartQty}
                     </span>
                   )}
 
                   {showProductImages && (
-                    <div className="w-full aspect-square rounded-lg mb-2 relative overflow-hidden">
+                    <div className="w-full h-20 sm:h-40 rounded-lg mb-1.5 sm:mb-2 relative overflow-hidden">
                       <div
                         className="absolute inset-0 flex items-center justify-center"
                         style={{ backgroundColor: nameToColor(product.name) }}
                       >
-                        <span className="text-2xl font-bold text-white/80">
+                        <span className="text-xl sm:text-2xl font-bold text-white/80">
                           {product.name.substring(0, 2).toUpperCase()}
                         </span>
                       </div>
@@ -585,14 +585,14 @@ export default function ProductGrid({
                       )}
 
                       {product.tags && product.tags.length > 0 && (
-                        <span className="absolute bottom-1.5 end-1.5 z-10">
+                        <span className="hidden sm:block absolute bottom-1.5 end-1.5 z-10">
                           <TagBadge tag={product.tags[0]} />
                         </span>
                       )}
                     </div>
                   )}
 
-                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                  <div className="hidden sm:flex items-center gap-1.5 mb-1 flex-wrap">
                     {!isBox ? (
                       <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50">
                         8 pcs / plate
@@ -604,18 +604,18 @@ export default function ProductGrid({
                     )}
                   </div>
 
-                  <h3 className="font-semibold text-foreground text-sm line-clamp-2 leading-snug">
+                  <h3 className="font-semibold text-foreground text-xs sm:text-sm line-clamp-1 sm:line-clamp-2 leading-snug">
                     {product.name}
                   </h3>
                   <div className="flex items-center justify-between mt-1">
-                    <p className="text-brand font-bold">{fmt(Number(product.price))}</p>
+                    <p className="text-brand font-bold text-xs sm:text-base">{fmt(Number(product.price))}</p>
                     <div className="flex items-center gap-1 shrink-0">
                       {!showProductImages && product.tags && product.tags.length > 0 && (
-                        <TagBadge tag={product.tags[0]} />
+                        <span className="hidden sm:inline-block"><TagBadge tag={product.tags[0]} /></span>
                       )}
                       {productNeedsCustomizer(product) && (
                         <span
-                          className="touch-target -me-2 -my-2 rounded-lg text-muted-foreground"
+                          className="touch-target -me-2 -my-2 rounded-lg text-muted-foreground hidden sm:inline-flex"
                           title={t('customisable')}
                           aria-label={t('customisable')}
                         >

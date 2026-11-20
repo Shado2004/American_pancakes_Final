@@ -26,6 +26,7 @@ import {
 } from './countries';
 import { clearInMemoryRevokedTokens, clearUserAuthCache } from './middleware/security';
 import { clearJWTSecretCache } from './security/jwt-secret';
+export * from './db/pg';
 
 const USER_ROLE_SQL_CHECK = `CHECK (role IN (${ROLE_KEYS.map((role) => `'${role}'`).join(', ')}))`;
 

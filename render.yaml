@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: american-pancakes-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install && npm run build
+    startCommand: node dev-server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: APP_ORIGIN
+        value: '*'
+      - key: DATABASE_URL
+        sync: false

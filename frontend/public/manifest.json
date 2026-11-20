@@ -1,11 +1,11 @@
 {
-  "name": "Flo",
-  "short_name": "Flo",
-  "description": "Smart Point of Sale for restaurants, salons, and retail",
-  "start_url": "/dashboard",
+  "name": "American Pancakes POS",
+  "short_name": "PancakesPOS",
+  "description": "Point of Sale for American Pancakes",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3248FF",
+  "background_color": "#FAF7F2",
+  "theme_color": "#F59E0B",
   "orientation": "any",
   "icons": [
     {

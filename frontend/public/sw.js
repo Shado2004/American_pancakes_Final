@@ -1,11 +1,12 @@
-const CACHE_NAME = 'flo-v19';
+const CACHE_NAME = 'american-pancakes-pos-v1';
 const PRECACHE_URLS = [
-  '/dashboard',
+  '/',
   '/pos',
+  '/dashboard',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
-  '/logo.svg',
+  '/logo.png',
 ];
 
 self.addEventListener('install', (event) => {
