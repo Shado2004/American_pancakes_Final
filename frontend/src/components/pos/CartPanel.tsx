@@ -363,29 +363,31 @@ export default function CartPanel({
             </div>
           )}
 
-        <div className="flex items-center justify-between px-3 py-2 bg-muted/60 rounded-lg">
-          <div className="flex items-center gap-2 text-xs font-semibold text-foreground flex-wrap">
-            <ShoppingCart size={15} className="text-brand" />
-            <span>Cart</span>
+        <div className="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-pink-50 via-white to-sky-50 dark:from-zinc-900 dark:to-zinc-800 border border-pink-100 dark:border-zinc-800 rounded-xl shadow-xs">
+          <div className="flex items-center gap-2 text-xs font-bold text-foreground flex-wrap">
+            <ShoppingCart size={15} className="text-pink-600 dark:text-pink-400" />
+            <span>Order Cart</span>
             <span
               data-testid="sale-type-badge"
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ${
                 cart.bogoActive
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-muted text-muted-foreground border border-border/80'
+                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-xs'
+                  : 'bg-white text-pink-700 border border-pink-200'
               }`}
             >
               {cart.bogoActive ? (
                 <>
-                  <Sparkles size={11} /> Sale Type: BOGO Sale
+                  <Sparkles size={11} /> BOGO Promo
                 </>
               ) : (
-                'Sale Type: Normal Sale'
+                'Standard Sale'
               )}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Roadside Stall</span>
+            <span className="text-[10px] font-bold text-sky-700 dark:text-sky-300 bg-sky-100/80 dark:bg-sky-950/60 border border-sky-200/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              Restaurant POS
+            </span>
           </div>
         </div>
       </div>

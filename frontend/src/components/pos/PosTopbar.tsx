@@ -94,18 +94,23 @@ export default function PosTopbar({
   return (
     // Identity/search first, the action buttons end-aligned next to it, and the
     // customer favorites row full-width beneath both.
-    <div className="flex flex-col border-b bg-card shrink-0 px-3 py-2 sm:px-4 sm:py-2.5">
+    <div className="flex flex-col border-b border-pink-100 dark:border-zinc-800 bg-white/95 dark:bg-card/95 backdrop-blur-sm shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 shadow-xs">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2.5">
-            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-white border border-amber-200 shadow-xs overflow-hidden">
+          <div className="flex items-center gap-3">
+            <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-pink-50 via-white to-sky-50 border border-pink-200/80 shadow-xs overflow-hidden">
               <img
                 src="/logo.png"
                 alt="The American Pancakes"
-                className="size-7 object-contain"
+                className="size-8 object-contain"
               />
             </div>
-            <span className="text-base font-bold text-foreground tracking-tight">American Pancakes</span>
+            <div className="flex items-center gap-2">
+              <span className="text-base font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">American Pancakes</span>
+              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-100 text-pink-700 border border-pink-200/70">
+                Pancake & Dessert Restaurant
+              </span>
+            </div>
           </div>
         </div>
 

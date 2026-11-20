@@ -266,18 +266,18 @@ export default function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href={homeHref}>
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-white border border-amber-200/80 shadow-xs overflow-hidden">
+                <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-pink-50 via-white to-sky-50 border border-pink-200/80 shadow-xs overflow-hidden">
                   <img
                     src="/logo.png"
                     alt="American Pancakes"
-                    className="size-7 object-contain"
+                    className="size-8 object-contain"
                   />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0 leading-none">
-                  <span className="font-semibold truncate">
+                  <span className="font-extrabold text-sm text-foreground truncate">
                     {currentTenant?.business_name || 'American Pancakes'}
                   </span>
-                  <span className="text-[10px] text-muted-foreground font-medium">POS Terminal</span>
+                  <span className="text-[10px] text-pink-600 font-bold uppercase tracking-wider">Restaurant POS</span>
                 </div>
               </Link>
             </SidebarMenuButton>

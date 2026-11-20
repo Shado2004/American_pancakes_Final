@@ -256,7 +256,7 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50/60 via-white to-sky-50/60 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img
@@ -272,12 +272,12 @@ function LoginContent() {
           </div>
         )}
         {pinUsers.length > 0 && (
-          <Card className="mb-4" data-testid="pin-user-picker">
+          <Card className="mb-4 border border-pink-100 dark:border-zinc-800 shadow-xl shadow-pink-500/5 rounded-2xl bg-white dark:bg-card" data-testid="pin-user-picker">
             <CardContent className="pt-5">
               <div className="flex items-center justify-between gap-2 mb-3">
                 <div>
-                  <h2 className="text-base font-semibold text-foreground flex items-center gap-1.5">
-                    <KeyRound className="size-4 text-primary" />
+                  <h2 className="text-base font-bold text-foreground flex items-center gap-1.5">
+                    <KeyRound className="size-4 text-pink-500" />
                     {t('quickSwitchTitle')}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">{t('quickSwitchSubtitle')}</p>
@@ -285,14 +285,16 @@ function LoginContent() {
               </div>
               {selectedPinUser ? (
                 <form onSubmit={handlePinLogin} data-testid="pin-login-form" className="space-y-3">
-                  <div className="flex items-center justify-between rounded-lg border border-primary/40 bg-primary/5 px-3 py-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <UserCheck className="size-4 text-primary shrink-0" />
-                      <span className="font-semibold text-sm truncate text-foreground">
+                  <div className="flex items-center justify-between rounded-xl border border-pink-200 bg-gradient-to-r from-pink-50 to-sky-50 dark:from-zinc-900 dark:to-zinc-800 px-3.5 py-2.5 shadow-xs">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex aspect-square size-6 items-center justify-center rounded-lg bg-pink-500 text-white shadow-xs">
+                        <UserCheck className="size-3.5" />
+                      </div>
+                      <span className="font-bold text-sm truncate text-foreground">
                         {selectedPinUser.name}
                       </span>
                     </div>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground capitalize shrink-0">
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300 capitalize shrink-0 border border-pink-200/60">
                       {ROLE_LABEL_KEYS[selectedPinUser.role]
                         ? tStaff(ROLE_LABEL_KEYS[selectedPinUser.role])
                         : selectedPinUser.role}
@@ -318,7 +320,7 @@ function LoginContent() {
                         if (pinError) setPinError(null);
                       }}
                       placeholder="••••"
-                      className="text-center tracking-widest text-lg font-mono"
+                      className="text-center tracking-widest text-lg font-mono rounded-xl border-pink-200 focus:border-pink-400 focus:ring-pink-200"
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-2" dir="ltr">
@@ -332,7 +334,7 @@ function LoginContent() {
                           setPin((prev) => (prev.length < 6 ? prev + digit : prev));
                           if (pinError) setPinError(null);
                         }}
-                        className="h-11 text-base font-semibold tabular-nums"
+                        className="h-11 text-base font-bold tabular-nums rounded-xl hover:border-pink-300 hover:bg-pink-50 hover:text-pink-600 transition-colors"
                       >
                         {digit}
                       </Button>
@@ -345,7 +347,7 @@ function LoginContent() {
                         setPin('');
                         setPinError(null);
                       }}
-                      className="h-11 text-xs font-medium"
+                      className="h-11 text-xs font-bold rounded-xl hover:bg-pink-50 hover:text-pink-600"
                     >
                       {tCommon('clear')}
                     </Button>
@@ -357,7 +359,7 @@ function LoginContent() {
                         setPin((prev) => (prev.length < 6 ? prev + '0' : prev));
                         if (pinError) setPinError(null);
                       }}
-                      className="h-11 text-base font-semibold tabular-nums"
+                      className="h-11 text-base font-bold tabular-nums rounded-xl hover:border-pink-300 hover:bg-pink-50 hover:text-pink-600 transition-colors"
                     >
                       0
                     </Button>
@@ -370,7 +372,7 @@ function LoginContent() {
                         setPin((prev) => prev.slice(0, -1));
                         if (pinError) setPinError(null);
                       }}
-                      className="h-11"
+                      className="h-11 rounded-xl hover:bg-pink-50 hover:text-pink-600"
                     >
                       <Delete className="size-4" />
                     </Button>
@@ -378,7 +380,7 @@ function LoginContent() {
                   {pinError && (
                     <p
                       data-testid="pin-login-error"
-                      className="text-sm text-destructive text-center"
+                      className="text-sm text-destructive text-center font-medium"
                     >
                       {pinError}
                     </p>
@@ -393,7 +395,7 @@ function LoginContent() {
                         setPin('');
                         setPinError(null);
                       }}
-                      className="flex-1"
+                      className="flex-1 rounded-xl"
                     >
                       {tCommon('cancel')}
                     </Button>
@@ -401,7 +403,7 @@ function LoginContent() {
                       type="submit"
                       data-testid="pin-login-submit"
                       disabled={loading || pin.length < 4}
-                      className="flex-1"
+                      className="flex-1 bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl shadow-md shadow-pink-500/25 transition-all"
                     >
                       {loading ? t('signingIn') : t('signIn')}
                     </Button>

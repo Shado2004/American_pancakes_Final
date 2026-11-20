@@ -3657,12 +3657,12 @@ export default function POSPage() {
       <Drawer open={mobileCartOpen} onOpenChange={setMobileCartOpen}>
         <DrawerTrigger asChild>
           <button
-            className="touch-target fixed bottom-5 end-5 z-40 w-14 h-14 bg-brand text-white rounded-full shadow-lg hover:bg-brand-hover active:bg-brand-hover transition-colors md:hidden"
+            className="touch-target fixed bottom-5 end-5 z-40 w-14 h-14 bg-gradient-to-tr from-pink-500 to-rose-500 text-white rounded-full shadow-xl shadow-pink-500/30 hover:scale-105 active:scale-95 transition-all md:hidden"
             aria-label={t('cart')}
           >
             <ShoppingCart size={22} />
             {itemCount > 0 && (
-              <span className="absolute -top-0.5 -end-0.5 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+              <span className="absolute -top-0.5 -end-0.5 bg-sky-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold shadow-sm">
                 {itemCount}
               </span>
             )}

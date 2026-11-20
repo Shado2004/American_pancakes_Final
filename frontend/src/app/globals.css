@@ -7,43 +7,41 @@
 :root {
   --font-sans: "Geist", "Noto Sans Devanagari", "Nirmala UI", "Kohinoor Devanagari", "Devanagari Sangam MN", system-ui, sans-serif;
   --font-mono: "Geist Mono", monospace;
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #ea580c;
-  --primary-foreground: #ffffff;
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: #fff7ed;
-  --accent-foreground: #9a3412;
+  --radius: 0.75rem;
+  --background: #FCFBF9;
+  --foreground: #1E293B;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #EC4899;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F0F9FF;
+  --secondary-foreground: #0369A1;
+  --muted: #F8FAFC;
+  --muted-foreground: #64748B;
+  --accent: #FDF2F8;
+  --accent-foreground: #BE185D;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: #ea580c;
-  /* Semantic surfaces: new UI uses these instead of raw gray or indigo
-   * utilities. Existing raw-color usage migrates only when that page is
-   * already being touched, not as a standalone sweep. */
+  --border: #F1F5F9;
+  --input: #E2E8F0;
+  --ring: #38BDF8;
+  /* Semantic surfaces: White, Strawberry Pink, and Sky Blue theme */
   --panel: var(--card);
-  --selected-row: #ffedd5;
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #ea580c;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ffedd5;
-  --sidebar-accent-foreground: #9a3412;
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: #ea580c;
+  --selected-row: #FDF2F8;
+  --chart-1: #EC4899;
+  --chart-2: #0284C7;
+  --chart-3: #F59E0B;
+  --chart-4: #8B5CF6;
+  --chart-5: #10B981;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1E293B;
+  --sidebar-primary: #EC4899;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FDF2F8;
+  --sidebar-accent-foreground: #BE185D;
+  --sidebar-border: #F1F5F9;
+  --sidebar-ring: #38BDF8;
 
   /* Hoisted to :root so fixed app chrome can offset below the title bar;
    * consumed by both .flo-title-bar and the sidebar inset rules below. */
@@ -348,7 +346,7 @@ div:hover > .flo-toast-drain,
 }
 
 .flo-toast-drain--blank {
-  background-color: var(--sidebar-primary, #ea580c);
+  background-color: var(--sidebar-primary, #EC4899);
 }
 
 
@@ -413,53 +411,55 @@ div:hover > .flo-toast-drain,
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Brand colors */
-  --color-brand: #ea580c;
-  --color-brand-light: #fff7ed;
-  --color-brand-hover: #c2410c;
-  --color-brand-ring: rgba(234, 88, 12, 0.4);
-  --color-success: #00cc61;
-  --color-success-light: #dcfce7;
-  --color-success-hover: #00b355;
+  /* Brand colors — White, Strawberry Pink, and Sky Blue */
+  --color-brand: #EC4899;
+  --color-brand-light: #FDF2F8;
+  --color-brand-hover: #DB2777;
+  --color-brand-ring: rgba(236, 72, 153, 0.4);
+  --color-blue-accent: #0284C7;
+  --color-blue-light: #E0F2FE;
+  --color-success: #10B981;
+  --color-success-light: #D1FAE5;
+  --color-success-hover: #059669;
 }
 
 .dark {
-  --background: oklch(0.17 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.22 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.22 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: #f97316;
-  --primary-foreground: #ffffff;
-  --secondary: oklch(0.28 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.28 0 0);
-  --muted-foreground: oklch(0.75 0 0);
-  --accent: oklch(0.28 0.05 45);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
+  --primary: #F472B6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1E293B;
+  --secondary-foreground: #F8FAFC;
+  --muted: #334155;
+  --muted-foreground: #94A3B8;
+  --accent: #371B28;
+  --accent-foreground: #F472B6;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 18%);
-  --ring: #f97316;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #38BDF8;
   --panel: var(--card);
-  --selected-row: oklch(0.24 0.05 45);
-  --chart-1: oklch(0.70 0.20 45);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: #f97316;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.28 0.05 45);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: #f97316;
+  --selected-row: #371B28;
+  --chart-1: #F472B6;
+  --chart-2: #38BDF8;
+  --chart-3: #FBBF24;
+  --chart-4: #A78BFA;
+  --chart-5: #34D399;
+  --sidebar: #0F172A;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #F472B6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #371B28;
+  --sidebar-accent-foreground: #F472B6;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #38BDF8;
 
   /* Brand surface for bg-brand-light in dark mode */
-  --color-brand-light: oklch(0.24 0.05 45);
+  --color-brand-light: #371B28;
 }
 
 html.dark::-webkit-scrollbar-thumb,

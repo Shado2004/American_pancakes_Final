@@ -41,14 +41,14 @@ function CategoryChip({
     <button
       onClick={onSelect}
       title={categoryName}
-      className={`max-w-56 truncate px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+      className={`max-w-56 truncate px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
         isSelected
           ? colorClasses
-            ? `${colorClasses.activeBg} ${colorClasses.activeText}`
-            : 'bg-brand text-white'
+            ? `${colorClasses.activeBg} ${colorClasses.activeText} shadow-md shadow-pink-500/20`
+            : 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md shadow-pink-500/20'
           : colorClasses
-            ? `${colorClasses.bg} ${colorClasses.text} border ${colorClasses.border} hover:opacity-80`
-            : 'bg-card text-foreground border border-border hover:bg-muted'
+            ? `${colorClasses.bg} ${colorClasses.text} border ${colorClasses.border} hover:opacity-90 shadow-xs`
+            : 'bg-white text-slate-700 border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 hover:text-pink-600 shadow-xs'
       }`}
     >
       {categoryName}
@@ -81,10 +81,10 @@ function CategoryRow({
     <button
       onClick={() => setSelectedCategory(null)}
       title={collapse ? allLabel : undefined}
-      className={`${collapse ? 'min-w-0 truncate ' : ''}px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+      className={`${collapse ? 'min-w-0 truncate ' : ''}px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
         !selectedCategory
-          ? 'bg-brand text-white'
-          : 'bg-card text-foreground border border-border hover:bg-muted'
+          ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md shadow-pink-500/20'
+          : 'bg-white text-slate-700 border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 hover:text-pink-600 shadow-xs'
       }`}
     >
       {allLabel}
@@ -526,10 +526,10 @@ export default function ProductGrid({
               <div
                 key={product.id}
                 data-testid="pos-product-card"
-                className={`min-h-28 sm:min-h-36 bg-card rounded-xl p-2 sm:p-2.5 border transition-all text-start relative overflow-hidden flex flex-col justify-between ${
+                className={`min-h-28 sm:min-h-36 bg-white dark:bg-zinc-800 rounded-2xl p-2.5 sm:p-3 border transition-all text-start relative overflow-hidden flex flex-col justify-between shadow-xs ${
                   inCartQty > 0
-                    ? 'ring-2 ring-amber-500 border-amber-500 bg-amber-500/5 shadow-sm'
-                    : 'border-border hover:border-brand/40 hover:shadow-md'
+                    ? 'ring-2 ring-pink-500 border-pink-500 bg-pink-50/20 dark:bg-pink-950/20 shadow-md'
+                    : 'border-slate-200/90 dark:border-zinc-700/80 hover:border-pink-300 hover:shadow-lg hover:-translate-y-0.5'
                 }`}
               >
                 <button
@@ -557,13 +557,13 @@ export default function ProductGrid({
                     </>
                   )}
                   {inCartQty > 0 && (
-                    <span className="absolute top-0 end-0 bg-amber-500 text-white text-[10px] sm:text-xs w-5 h-5 sm:w-6 sm:h-6 rounded-es-lg flex items-center justify-center font-bold z-10">
+                    <span className="absolute top-0 end-0 bg-gradient-to-br from-pink-500 to-rose-500 text-white text-[10px] sm:text-xs w-6 h-6 rounded-es-xl flex items-center justify-center font-bold z-10 shadow-sm">
                       {inCartQty}
                     </span>
                   )}
 
                   {showProductImages && (
-                    <div className="w-full h-20 sm:h-40 rounded-lg mb-1.5 sm:mb-2 relative overflow-hidden">
+                    <div className="w-full h-24 sm:h-44 rounded-xl mb-2 relative overflow-hidden bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
                       <div
                         className="absolute inset-0 flex items-center justify-center"
                         style={{ backgroundColor: nameToColor(product.name) }}
@@ -577,7 +577,7 @@ export default function ProductGrid({
                         <img
                           src={`${api.defaults.baseURL}/products/${product.id}/image?t=${product.updated_at ? parseDbTimestamp(product.updated_at).getTime() : 0}`}
                           alt={product.name}
-                          className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                          className="absolute inset-0 w-full h-full object-cover rounded-xl"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
                           }}
@@ -594,21 +594,21 @@ export default function ProductGrid({
 
                   <div className="hidden sm:flex items-center gap-1.5 mb-1 flex-wrap">
                     {!isBox ? (
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 border border-pink-200/70">
                         8 pcs / plate
                       </span>
                     ) : (
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 border border-sky-200/70">
                         ₹5 Box
                       </span>
                     )}
                   </div>
 
-                  <h3 className="font-semibold text-foreground text-xs sm:text-sm line-clamp-1 sm:line-clamp-2 leading-snug">
+                  <h3 className="font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm line-clamp-1 sm:line-clamp-2 leading-snug">
                     {product.name}
                   </h3>
                   <div className="flex items-center justify-between mt-1">
-                    <p className="text-brand font-bold text-xs sm:text-base">{fmt(Number(product.price))}</p>
+                    <p className="text-pink-600 dark:text-pink-400 font-extrabold text-xs sm:text-base tracking-tight">{fmt(Number(product.price))}</p>
                     <div className="flex items-center gap-1 shrink-0">
                       {!showProductImages && product.tags && product.tags.length > 0 && (
                         <span className="hidden sm:inline-block"><TagBadge tag={product.tags[0]} /></span>
@@ -627,7 +627,7 @@ export default function ProductGrid({
                 </button>
 
                 {inCartQty > 0 && (
-                  <div className="flex items-center justify-between gap-1 mt-2 pt-1.5 border-t border-border/60">
+                  <div className="flex items-center justify-between gap-1 mt-2 pt-1.5 border-t border-pink-100 dark:border-zinc-700">
                     <button
                       type="button"
                       onClick={(e) => {
@@ -637,12 +637,12 @@ export default function ProductGrid({
                           cart.updateQuantity(itemInCart.id, itemInCart.quantity - 1);
                         }
                       }}
-                      className="h-7 w-7 rounded-lg bg-muted flex items-center justify-center font-bold text-muted-foreground hover:bg-muted/80 active:scale-95 transition-transform"
+                      className="h-7 w-7 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-zinc-700 dark:hover:bg-zinc-600 flex items-center justify-center font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition-transform"
                       aria-label="Decrease quantity"
                     >
                       <Minus size={14} />
                     </button>
-                    <span className="text-xs font-bold font-mono text-amber-600 dark:text-amber-400">
+                    <span className="text-xs font-bold font-mono text-pink-600 dark:text-pink-400">
                       {inCartQty} in cart
                     </span>
                     <button
@@ -651,7 +651,7 @@ export default function ProductGrid({
                         e.stopPropagation();
                         onProductClick(product, 1);
                       }}
-                      className="h-7 w-7 rounded-lg bg-brand text-white flex items-center justify-center font-bold hover:bg-brand/90 active:scale-95 transition-transform"
+                      className="h-7 w-7 rounded-lg bg-pink-500 hover:bg-pink-600 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-xs"
                       aria-label="Increase quantity"
                     >
                       <Plus size={14} />
