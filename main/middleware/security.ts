@@ -586,13 +586,23 @@ export const corsOptions = {
       const parsedOrigin = new URL(origin);
       const hostname = parsedOrigin.hostname;
 
-      if (hostname === 'localhost' || hostname.endsWith('.local') || isAllowedPrivateIp(hostname)) {
+      if (
+        process.env.APP_ORIGIN === '*' ||
+        process.env.RENDER ||
+        process.env.CLOUD_DEPLOYMENT ||
+        hostname === 'localhost' ||
+        hostname.endsWith('.local') ||
+        hostname.endsWith('.onrender.com') ||
+        (process.env.APP_ORIGIN &&
+          (origin === process.env.APP_ORIGIN || origin.startsWith(process.env.APP_ORIGIN))) ||
+        isAllowedPrivateIp(hostname)
+      ) {
         return callback(null, true);
       }
 
-      callback(new Error('Not allowed by CORS'));
-    } catch (err) {
-      callback(new Error('Invalid origin format'));
+      callback(null, false);
+    } catch {
+      callback(null, false);
     }
   },
 };
