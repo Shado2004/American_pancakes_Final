@@ -1,28 +1,42 @@
 import type { NextConfig } from 'next';
 import path from 'node:path';
 /**
- * NEXT_BUILD_MODE=desktop  →  static export for Electron (FloDesktop)
- * NEXT_BUILD_MODE unset    →  standard Next.js server mode (FloPOS cloud)
+ * NEXT_BUILD_MODE=desktop or GITHUB_PAGES=true  →  static export (FloDesktop / GitHub Pages)
+ * NEXT_BUILD_MODE unset                        →  standard Next.js server mode (FloPOS cloud)
  */
-const isDesktop = process.env.NEXT_BUILD_MODE === 'desktop';
+const isStaticExport =
+  process.env.NEXT_BUILD_MODE === 'desktop' ||
+  process.env.NEXT_BUILD_MODE === 'export' ||
+  process.env.GITHUB_PAGES === 'true';
 
 const nextConfig: NextConfig = {
-  // Static export: required for Electron — served via embedded Express,
-  // not file:// so no CORS/routing issues.
-  output: isDesktop ? 'export' : undefined,
+  // Static export: required for Electron & GitHub Pages
+  output: isStaticExport ? 'export' : undefined,
 
   // Trailing slashes make static paths predictable: /pos → /pos/index.html
-  trailingSlash: isDesktop,
+  trailingSlash: isStaticExport,
+
+  // Expose Supabase and API environment variables across both Next.js and Vite conventions
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL:
+      process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || '',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY:
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '',
+    VITE_SUPABASE_URL:
+      process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    VITE_SUPABASE_ANON_KEY:
+      process.env.VITE_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+  },
 
   // Release builds with PostHog credentials emit browser maps for scripts/posthog-sourcemaps.cjs,
   // which uploads and then deletes them; other builds ship no maps.
   productionBrowserSourceMaps:
-    isDesktop &&
+    isStaticExport &&
     Boolean(process.env.POSTHOG_CLI_API_KEY?.trim() && process.env.POSTHOG_CLI_PROJECT_ID?.trim()),
 
   // next/image optimisation requires a running server; disable for static export.
   images: {
-    unoptimized: isDesktop,
+    unoptimized: isStaticExport,
   },
 
   // Silence the "multiple lockfiles / inferred workspace root" warning.
