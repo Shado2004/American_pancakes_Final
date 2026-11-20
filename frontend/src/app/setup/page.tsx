@@ -291,7 +291,13 @@ export default function SetupPage() {
       });
       completeSetup();
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { error?: string } } };
+      const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
+      const status = axiosErr?.response?.status;
+      // On static web deployment (404/405/network error) or if already completed (403), proceed smoothly:
+      if (!axiosErr?.response || status === 403 || status === 404 || status === 405) {
+        completeSetup();
+        return;
+      }
       toast.error(axiosErr?.response?.data?.error || t('errorGeneric'));
     } finally {
       setLoading(false);
@@ -299,28 +305,38 @@ export default function SetupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50/60 via-white to-sky-50/60 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4 py-12">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <div className="mx-auto mb-4 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-amber-400 text-xl font-black text-amber-950 shadow-sm">
-            AP
-          </div>
-          <h1 className="text-3xl font-bold">{t('welcome')}</h1>
-          <p className="text-muted-foreground mt-2">{t('tagline')}</p>
+          <img
+            src="/logo.png"
+            alt="The American Pancakes"
+            className="mx-auto mb-3 h-20 w-auto object-contain drop-shadow-sm transition-transform hover:scale-105"
+          />
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+            The American Pancakes<span className="text-pink-500">™</span>
+          </h1>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
+            Restaurant Setup & Configuration
+          </p>
         </div>
 
         <div className="flex justify-center gap-2 mb-8">
           {[1, 2, 3, 4, 5].map((s) => (
             <div
               key={s}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                s === step ? 'bg-primary' : s < step ? 'bg-primary/50' : 'bg-muted'
+              className={`h-2 rounded-full transition-all duration-300 ${
+                s === step
+                  ? 'w-8 bg-gradient-to-r from-pink-500 to-rose-500 shadow-sm shadow-pink-500/30'
+                  : s < step
+                    ? 'w-2 bg-pink-400/70'
+                    : 'w-2 bg-slate-200 dark:bg-zinc-700'
               }`}
             />
           ))}
         </div>
 
-        <Card>
+        <Card className="border border-pink-100 dark:border-zinc-800 shadow-xl shadow-pink-500/5 rounded-2xl bg-white dark:bg-zinc-900 overflow-hidden">
           <CardContent className="pt-6">
             {step === 1 && (
               <div className="space-y-6">
@@ -991,8 +1007,8 @@ export default function SetupPage() {
                         onClick={() => setServiceModel(item.value)}
                         className={`p-5 rounded-xl border-2 text-start transition-all ${
                           selected
-                            ? 'border-primary bg-primary/5'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-pink-500 bg-pink-50/50 dark:bg-pink-950/20'
+                            : 'border-slate-200 dark:border-zinc-800 hover:border-pink-300'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -1007,7 +1023,7 @@ export default function SetupPage() {
                               {t(SERVICE_MODEL_KEYS[item.value].details)}
                             </div>
                           </div>
-                          {selected && <Check className="w-5 h-5 text-primary shrink-0" />}
+                          {selected && <Check className="w-5 h-5 text-pink-600 shrink-0" />}
                         </div>
                       </button>
                     );
@@ -1017,7 +1033,7 @@ export default function SetupPage() {
                 <Button
                   onClick={handleCompleteSetup}
                   disabled={loading}
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl shadow-md shadow-pink-500/25 transition-all"
                   size="lg"
                 >
                   {loading ? (

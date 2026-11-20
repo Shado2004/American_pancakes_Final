@@ -167,8 +167,8 @@ function LoginContent() {
         } else if (failure.status === 429) {
           // Middleware-level lockout (authRateLimit window exhausted)
           setLoginError(t('lockedOut', { minutes: 15 }));
-        } else if (failure.status === undefined) {
-          // No HTTP response at all: the server was unreachable (network).
+        } else if (failure.status === undefined || failure.status === 404 || failure.status === 405) {
+          // No HTTP response at all or static endpoint absent
           setLoginError(t('connectionFailed'));
         } else {
           // Other server-side failures belong under the database/setup banner.
@@ -209,7 +209,7 @@ function LoginContent() {
         } else if (failure.status === 429) {
           const mins = failure.lockoutMinutes ?? 15;
           setPinError(t('lockedOut', { minutes: mins }));
-        } else if (failure.status === undefined) {
+        } else if (failure.status === undefined || failure.status === 404 || failure.status === 405) {
           setPinError(t('connectionFailed'));
         } else {
           setPinError(t('loginFailed'));
