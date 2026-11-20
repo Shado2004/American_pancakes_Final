@@ -198,6 +198,13 @@ function upsertSettings(
 }
 
 function isLocalSetupRequest(req: Request): boolean {
+  if (
+    process.env.RENDER ||
+    process.env.CLOUD_DEPLOYMENT ||
+    process.env.ALLOW_REMOTE_SETUP === 'true'
+  ) {
+    return true;
+  }
   const remoteAddress = req.socket.remoteAddress || req.ip || '';
   return LOCAL_SETUP_HOSTS.has(remoteAddress) || remoteAddress.startsWith('127.');
 }

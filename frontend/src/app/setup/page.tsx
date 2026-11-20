@@ -290,8 +290,9 @@ export default function SetupPage() {
         ...countryPayload,
       });
       completeSetup();
-    } catch {
-      toast.error(t('errorGeneric'));
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { error?: string } } };
+      toast.error(axiosErr?.response?.data?.error || t('errorGeneric'));
     } finally {
       setLoading(false);
     }
