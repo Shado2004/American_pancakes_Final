@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { AxiosAdapter } from 'axios';
+import { isStaticCloudHost, handleCloudFallback } from './cloudStore';
 
 let authRedirectInProgress = false;
 
@@ -108,6 +109,27 @@ const api = axios.create({
   },
 });
 
+// Adapter to seamlessly route calls to Supabase and persistent cloud storage
+// when deployed statically on GitHub Pages without a Node.js Express backend.
+const originalAdapter = api.defaults.adapter;
+api.defaults.adapter = async (config) => {
+  if (isStaticCloudHost()) {
+    try {
+      const fallbackRes = await handleCloudFallback(config);
+      if (fallbackRes) return fallbackRes;
+    } catch (err) {
+      console.warn('[CloudStore] Adapter fallback error:', err);
+    }
+  }
+  if (typeof originalAdapter === 'function') {
+    return originalAdapter(config);
+  }
+  if (Array.isArray(originalAdapter) && originalAdapter.length > 0) {
+    return (originalAdapter[0] as AxiosAdapter)(config);
+  }
+  return (axios.defaults.adapter as AxiosAdapter)(config);
+};
+
 // Attach JWT token to every request
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
@@ -127,10 +149,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 responses
+// Handle 401 responses and offline/cloud fallback
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    // If request failed with 404, 405, or network error (e.g. backend server absent on static cloud)
+    if (
+      (error.response?.status === 404 ||
+        error.response?.status === 405 ||
+        !error.response ||
+        error.code === 'ERR_NETWORK') &&
+      typeof window !== 'undefined'
+    ) {
+      try {
+        const fallbackRes = await handleCloudFallback(error.config);
+        if (fallbackRes) return fallbackRes;
+      } catch (fallbackErr) {
+        console.warn('[CloudStore] Response interceptor error:', fallbackErr);
+      }
+    }
+
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       const authHeader = String(error.config?.headers?.Authorization || '');
       const requestToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
