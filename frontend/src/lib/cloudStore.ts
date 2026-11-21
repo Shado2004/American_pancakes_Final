@@ -359,9 +359,64 @@ export async function handleCloudFallback(
         }
       }
 
+      const storedProducts = getStored<Product[]>('products', DEFAULT_PRODUCTS);
+      const productMap = new Map(storedProducts.map((p) => [p.id, p]));
+
+      const sanitizedLocalOrders = localOrders.map((order) => {
+        let orderTotal = Number(order.total) || 0;
+        let orderSubtotal = Number(order.subtotal) || orderTotal;
+        let calculatedSum = 0;
+
+        const repairedItems = (order.items || []).map((it: any, idx: number) => {
+          const prod = productMap.get(it.product_id);
+          const unitPrice =
+            Number(it.unit_price) > 0
+              ? Number(it.unit_price)
+              : Number(it.price_override?.price ?? prod?.price ?? 80);
+          const qty = Number(it.quantity) || 1;
+          const lineTotal = Number(it.total) > 0 ? Number(it.total) : unitPrice * qty;
+          calculatedSum += lineTotal;
+
+          return {
+            ...it,
+            id: it.id || (order.id ? Number(order.id) + idx + 1 : Date.now() + idx),
+            order_id: Number(order.id) || Date.now(),
+            product_id: it.product_id,
+            product_name: it.product_name || prod?.name || 'Milk Chocolate Pancake',
+            product_sku: it.product_sku || prod?.sku || 'MCP-01',
+            unit_price: unitPrice,
+            quantity: qty,
+            subtotal: lineTotal,
+            total: lineTotal,
+            status: it.status || 'pending',
+          };
+        });
+
+        if (orderTotal === 0 && calculatedSum > 0) {
+          orderTotal = calculatedSum;
+          orderSubtotal = calculatedSum;
+        }
+
+        return {
+          ...order,
+          subtotal: orderSubtotal,
+          total: orderTotal,
+          items: repairedItems,
+          bill:
+            order.bill && Number(order.bill.total) > 0
+              ? order.bill
+              : makeBill(
+                  Number(order.id) || Date.now(),
+                  order.order_number,
+                  orderTotal,
+                  order.created_at || new Date().toISOString()
+                ),
+        };
+      });
+
       // Merge unique by order_number
       const map = new Map<string, Order>();
-      for (const o of localOrders) {
+      for (const o of sanitizedLocalOrders) {
         map.set(o.order_number, o);
       }
       for (const o of cloudOrders) {
@@ -373,6 +428,14 @@ export async function handleCloudFallback(
       const merged = Array.from(map.values()).sort(
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
+
+      if (pathname.startsWith('/orders/')) {
+        const orderIdStr = pathname.replace('/orders/', '').split('/')[0];
+        const targetOrder = merged.find(
+          (o) => String(o.id) === orderIdStr || o.order_number === orderIdStr
+        );
+        return mockResponse({ order: targetOrder || null }, config);
+      }
 
       return mockResponse({ orders: merged, nextCursor: null }, config);
     }
