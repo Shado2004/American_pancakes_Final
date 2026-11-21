@@ -61,10 +61,11 @@ export class StorageUnavailableError extends Error {
 
 /** Persists session token and optional tenant in localStorage;
  * throws StorageUnavailableError if storage is disabled or unavailable. */
-function persistSession(token: string, tenant: Tenant | null): void {
+function persistSession(token: string, tenant: Tenant | null, user?: User | null): void {
   try {
     localStorage.setItem('token', token);
     if (tenant) localStorage.setItem('tenant', JSON.stringify(tenant));
+    if (user) localStorage.setItem('user', JSON.stringify(user));
   } catch {
     throw new StorageUnavailableError();
   }
@@ -137,7 +138,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (operation !== authOperation) return;
     const tenants: Tenant[] = data.tenants;
     const currentTenant = tenants.length === 1 ? tenants[0] : null;
-    persistSession(data.access_token, currentTenant);
+    persistSession(data.access_token, currentTenant, data.user);
     syncTenantLanguage(currentTenant);
     const failedLanguages = currentTenant
       ? await syncPrintPoliciesAtBootstrap(
@@ -203,7 +204,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (operation !== authOperation) return;
     const tenants: Tenant[] = data.tenants;
     const currentTenant = tenants.length === 1 ? tenants[0] : null;
-    persistSession(data.access_token, currentTenant);
+    persistSession(data.access_token, currentTenant, data.user);
     syncTenantLanguage(currentTenant);
     const failedLanguages = currentTenant
       ? await syncPrintPoliciesAtBootstrap(
@@ -287,6 +288,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .catch(() => {});
     localStorage.removeItem('token');
     localStorage.removeItem('tenant');
+    localStorage.removeItem('user');
     set({
       user: null,
       token: null,
@@ -311,17 +313,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const tokenAtStart = state.token;
     if (!tokenAtStart) return;
     const operation = authOperation;
-    const { data } = await api.get('/auth/me');
-    if (operation !== authOperation || useAuthStore.getState().token !== tokenAtStart) return;
-    const latestState = useAuthStore.getState();
-    const tenants: Tenant[] = data.tenants || [];
-    const currentTenant = latestState.currentTenant
-      ? (tenants.find((tenant) => tenant.id === latestState.currentTenant?.id) ?? null)
-      : tenants.length === 1
-        ? tenants[0]
-        : null;
-    if (currentTenant) localStorage.setItem('tenant', JSON.stringify(currentTenant));
-    set({ user: data.user, tenants, currentTenant });
+    try {
+      const { data } = await api.get('/auth/me');
+      if (operation !== authOperation || useAuthStore.getState().token !== tokenAtStart) return;
+      const latestState = useAuthStore.getState();
+      const tenants: Tenant[] = data.tenants || [];
+      const currentTenant = latestState.currentTenant
+        ? (tenants.find((tenant) => tenant.id === latestState.currentTenant?.id) ?? null)
+        : tenants.length === 1
+          ? tenants[0]
+          : null;
+      if (currentTenant) localStorage.setItem('tenant', JSON.stringify(currentTenant));
+      if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+      set({ user: data.user, tenants, currentTenant });
+    } catch {
+      // In static web deployment or network hiccup, do not wipe user context
+    }
   },
 
   loadFromStorage: async () => {
@@ -333,6 +340,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
     const token = localStorage.getItem('token');
     const tenantStr = localStorage.getItem('tenant');
+    const userStr = localStorage.getItem('user');
+    let storedUser: User | null = null;
+    if (userStr) {
+      try {
+        const parsed = JSON.parse(userStr);
+        if (parsed && typeof parsed === 'object') storedUser = parsed as User;
+      } catch {
+        localStorage.removeItem('user');
+      }
+    }
     let currentTenant: Tenant | null = null;
     if (tenantStr) {
       try {
@@ -359,6 +376,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             : null;
           const resolved = freshTenant ?? (tenants.length === 1 ? tenants[0] : null);
           if (resolved) localStorage.setItem('tenant', JSON.stringify(resolved));
+          if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
           set({
             user: data.user,
             token,
@@ -378,10 +396,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           if (operation !== authOperation || failedLanguages === null) return;
           set({ loading: false, printLanguageLoadErrors: failedLanguages });
         })
-        .catch(() => {
+        .catch((err) => {
           if (operation !== authOperation) return;
+          const status = (err as { response?: { status?: number } })?.response?.status;
+          // In static export or offline mode (when /api/auth/me returns 404/405/network error):
+          // retain stored user and tenant rather than destroying the active POS session!
+          if (status !== 401 && status !== 403 && storedUser && currentTenant) {
+            set({
+              user: storedUser,
+              token,
+              tenants: [currentTenant],
+              currentTenant,
+              loading: false,
+              printLanguageLoadErrors: [],
+            });
+            return;
+          }
           localStorage.removeItem('token');
           localStorage.removeItem('tenant');
+          localStorage.removeItem('user');
           set({ loading: false, printLanguageLoadErrors: [] });
         });
     } else {
