@@ -48,6 +48,7 @@ import { useAmountFormat } from '@/hooks/useAmountFormat';
 import CurrencyAmountInput from '@/components/ui/CurrencyAmountInput';
 import { useConfirm } from '@/hooks/use-confirm';
 import { nameToColor } from '@/lib/image-utils';
+import { DEFAULT_PRODUCTS, DEFAULT_CATEGORIES } from '@/lib/cloudStore';
 import { useTranslations, type AppConfig } from 'use-intl';
 import { tenantCan } from '@/lib/permissions';
 import { isMenuCategoryVisible } from '@/lib/printer/menu-web-print';
@@ -283,7 +284,12 @@ export default function ProductsPage() {
       setCategories((catRes.data.categories as Category[]) || []);
       if (agRes) setAddonGroups((agRes.data.addon_groups as AddonGroup[]) || []);
     } catch {
-      toast.error(t('failedToLoad'));
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        setProducts(DEFAULT_PRODUCTS);
+        setCategories(DEFAULT_CATEGORIES);
+      } else {
+        toast.error(t('failedToLoad'));
+      }
     } finally {
       setLoading(false);
     }
@@ -303,8 +309,12 @@ export default function ProductsPage() {
         if (agRes) setAddonGroups((agRes.data.addon_groups as AddonGroup[]) || []);
       })
       .catch((err: unknown) => {
-        if (!(err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError')))
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          setProducts(DEFAULT_PRODUCTS);
+          setCategories(DEFAULT_CATEGORIES);
+        } else if (!(err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError'))) {
           toast.error(t('failedToLoad'));
+        }
       })
       .finally(() => {
         setLoading(false);

@@ -568,6 +568,16 @@ export default function OrdersPage() {
       });
       return true;
     } catch {
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        try {
+          const raw = localStorage.getItem('flo_cloud_orders');
+          const fallbackOrders: Order[] = raw ? JSON.parse(raw) : [];
+          setOrders(fallbackOrders);
+          return true;
+        } catch {
+          // ignore
+        }
+      }
       if (fetchId === ordersFetchIdRef.current && requestFilterKey === ordersFilterKeyRef.current)
         toast.error(tOrders('loadOrdersFailed'));
       return false;

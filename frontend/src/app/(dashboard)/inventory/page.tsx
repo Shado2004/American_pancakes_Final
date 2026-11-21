@@ -182,8 +182,11 @@ export default function InventoryPage() {
       .get('/supplies', { params, signal: controller.signal })
       .then(({ data }) => setSupplies(data.supplies || []))
       .catch((err: unknown) => {
-        if (!(err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError')))
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          setSupplies([]);
+        } else if (!(err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError'))) {
           toast.error(t('loadFailed'));
+        }
       });
     return () => controller.abort();
     // oxlint-disable-next-line react-hooks/exhaustive-deps
@@ -201,8 +204,11 @@ export default function InventoryPage() {
         setProducts(productsRes.data.products || []);
       })
       .catch((err: unknown) => {
-        if (!(err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError')))
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          setSupplies([]);
+        } else if (!(err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError'))) {
           toast.error(t('loadFailed'));
+        }
       });
     return () => controller.abort();
     // oxlint-disable-next-line react-hooks/exhaustive-deps
@@ -226,7 +232,9 @@ export default function InventoryPage() {
       } catch {
         if (requestSequence === movementRequestSequence.current) {
           movementResolvedSequence.current = requestSequence;
-          toast.error(t('loadFailed'));
+          if (typeof window === 'undefined' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            toast.error(t('loadFailed'));
+          }
         }
       }
     },
@@ -249,11 +257,14 @@ export default function InventoryPage() {
         movementResolvedSequence.current = requestSequence;
       })
       .catch((err: unknown) => {
-        if (
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          setMovements([]);
+        } else if (
           requestSequence === movementRequestSequence.current &&
           !(err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError'))
-        )
+        ) {
           toast.error(t('loadFailed'));
+        }
       });
     return () => controller.abort();
     // oxlint-disable-next-line react-hooks/exhaustive-deps

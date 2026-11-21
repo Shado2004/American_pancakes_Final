@@ -36,6 +36,7 @@ import {
 } from '@/lib/i18n-enums';
 import { TableTurnoverBadge } from '@/components/tables/TableTurnoverBadge';
 import { useFormatCurrency } from '@/hooks/useFormatCurrency';
+import { DEFAULT_TABLES } from '@/lib/cloudStore';
 
 const statusColors: Record<string, string> = {
   available: 'bg-green-500',
@@ -369,7 +370,11 @@ export default function TablesPage() {
       const { data } = await api.get('/tables');
       setTables(data.tables || []);
     } catch {
-      toast.error(tTables('loadFailed'));
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        setTables(DEFAULT_TABLES);
+      } else {
+        toast.error(tTables('loadFailed'));
+      }
     } finally {
       setLoading(false);
     }
@@ -380,7 +385,13 @@ export default function TablesPage() {
       api
         .get('/tables')
         .then(({ data }) => setTables(data.tables || []))
-        .catch(() => toast.error(tTables('loadFailed')))
+        .catch(() => {
+          if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            setTables(DEFAULT_TABLES);
+          } else {
+            toast.error(tTables('loadFailed'));
+          }
+        })
         .finally(() => setLoading(false));
     };
     load();

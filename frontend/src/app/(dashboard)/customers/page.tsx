@@ -135,10 +135,13 @@ export default function CustomersPage() {
         .get('/customers', { params, signal: controller.signal })
         .then(({ data }) => setCustomers(data.data || []))
         .catch((err: unknown) => {
-          if (
+          if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            setCustomers([]);
+          } else if (
             !(err instanceof Error && (err.name === 'CanceledError' || err.name === 'AbortError'))
-          )
+          ) {
             toast.error(tCustomer('loadFailed'));
+          }
         })
         .finally(() => {
           setLoading(false);

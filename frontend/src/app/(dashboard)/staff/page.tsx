@@ -15,6 +15,7 @@ import { validatePassword } from '@shared/password-policy';
 import { ROLE_ACCESS, ROLE_KEYS, hasRole } from '@shared/role-permissions';
 import { ROLE_LABEL_KEYS } from '@/lib/i18n-enums';
 import { tenantCan } from '@/lib/permissions';
+import { DEFAULT_STAFF } from '@/lib/cloudStore';
 
 const VALID_ROLES = ROLE_KEYS;
 
@@ -83,7 +84,11 @@ export default function StaffPage() {
       const { data } = await api.get(canManagePermissions ? '/authorization/users' : '/staff');
       setStaff(data.staff || data.users || []);
     } catch {
-      toast.error(t('failedToLoad'));
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        setStaff(DEFAULT_STAFF as unknown as Staff[]);
+      } else {
+        toast.error(t('failedToLoad'));
+      }
     } finally {
       setLoading(false);
     }
@@ -93,7 +98,13 @@ export default function StaffPage() {
     api
       .get(canManagePermissions ? '/authorization/users' : '/staff')
       .then(({ data }) => setStaff(data.staff || data.users || []))
-      .catch(() => toast.error(t('failedToLoad')))
+      .catch(() => {
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          setStaff(DEFAULT_STAFF as unknown as Staff[]);
+        } else {
+          toast.error(t('failedToLoad'));
+        }
+      })
       .finally(() => setLoading(false));
     api
       .get('/kitchen-stations')

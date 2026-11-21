@@ -263,17 +263,37 @@ function mockResponse(data: unknown, config: InternalAxiosRequestConfig, status 
   };
 }
 
+function getStableOrderId(orderNumber: string, idx = 0): number {
+  let hash = 0;
+  for (let i = 0; i < orderNumber.length; i++) {
+    hash = (hash << 5) - hash + orderNumber.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash) + idx + 1;
+}
+
+function getPathname(rawUrl: string): string {
+  let p = rawUrl.replace(/^https?:\/\/[^/]+/, '').split('?')[0];
+  if (p.startsWith('/api/')) p = p.slice(4);
+  else if (p === '/api') p = '/';
+  else if (p.startsWith('api/')) p = '/' + p.slice(4);
+  if (!p.startsWith('/')) p = '/' + p;
+  return p;
+}
+
 export async function handleCloudFallback(
   config: InternalAxiosRequestConfig
 ): Promise<AxiosResponse | null> {
   const method = (config.method || 'get').toLowerCase();
   const rawUrl = config.url || '';
-  const pathname = rawUrl
-    .replace(/^https?:\/\/[^/]+/, '')
-    .replace(/^\/?api\/?/, '/')
-    .split('?')[0];
+  const pathname = getPathname(rawUrl);
 
   const supabase = getSupabaseClient();
+
+  // CASH SESSIONS
+  if (pathname.startsWith('/cash-sessions')) {
+    return mockResponse(null, config);
+  }
 
   // 1. ORDERS
   if (pathname === '/orders' || pathname.startsWith('/orders/')) {
@@ -282,36 +302,47 @@ export async function handleCloudFallback(
       let cloudOrders: Order[] = [];
       if (supabase) {
         try {
-          const { data } = await supabase
+          const fetchPromise = supabase
             .from('orders')
             .select('*')
             .order('created_at', { ascending: false });
+          const timeoutPromise = new Promise<{ data: null }>((resolve) =>
+            setTimeout(() => resolve({ data: null }), 1500)
+          );
+          const { data } = (await Promise.race([fetchPromise, timeoutPromise])) as any;
           if (data && Array.isArray(data)) {
-            cloudOrders = data.map((row) => ({
-              id: row.id || Date.now(),
-              order_number: row.order_number || `AP-${row.id}`,
-              type: row.type || 'dine_in',
-              status: row.status || 'completed',
-              total: Number(row.total) || 0,
-              subtotal: Number(row.subtotal || row.total) || 0,
-              tax_amount: Number(row.tax_amount) || 0,
-              discount_amount: Number(row.discount_amount) || 0,
-              delivery_charge: Number(row.delivery_charge) || 0,
-              service_charge: Number(row.service_charge) || 0,
-              created_by: 1,
-              created_at: row.created_at || new Date().toISOString(),
-              guest_count: 1,
-              special_instructions: null,
-              table_id: row.table_id || null,
-              customer_id: row.customer_id || null,
-              items: [],
-              bill: makeBill(
-                row.id || Date.now(),
-                row.order_number || String(row.id || Date.now()),
-                Number(row.total) || 0,
-                row.created_at || new Date().toISOString()
-              ),
-            }));
+            cloudOrders = data.map((row, idx) => {
+              const orderNum = row.order_number || `AP-${1000 + idx}`;
+              const stableId = row.id ? Number(row.id) : getStableOrderId(orderNum, idx);
+              const createdAt = row.created_at
+                ? String(row.created_at).replace(' ', 'T')
+                : new Date().toISOString();
+              return {
+                id: stableId,
+                order_number: orderNum,
+                type: row.type || 'dine_in',
+                status: row.status || 'completed',
+                total: Number(row.total) || 0,
+                subtotal: Number(row.subtotal || row.total) || 0,
+                tax_amount: Number(row.tax_amount) || 0,
+                discount_amount: Number(row.discount_amount) || 0,
+                delivery_charge: Number(row.delivery_charge) || 0,
+                service_charge: Number(row.service_charge) || 0,
+                created_by: 1,
+                created_at: createdAt,
+                guest_count: 1,
+                special_instructions: null,
+                table_id: row.table_id || null,
+                customer_id: row.customer_id || null,
+                items: [],
+                bill: makeBill(
+                  stableId,
+                  orderNum,
+                  Number(row.total) || 0,
+                  createdAt
+                ),
+              };
+            });
           }
         } catch {
           // ignore Supabase error
@@ -451,8 +482,16 @@ export async function handleCloudFallback(
   }
 
   // 7. STAFF / USERS
-  if (pathname === '/staff' || pathname.startsWith('/staff') || pathname.includes('users')) {
-    return mockResponse({ staff: DEFAULT_STAFF, users: DEFAULT_STAFF }, config);
+  if (
+    pathname === '/staff' ||
+    pathname.startsWith('/staff') ||
+    pathname.includes('users') ||
+    pathname.includes('approvers')
+  ) {
+    return mockResponse(
+      { staff: DEFAULT_STAFF, users: DEFAULT_STAFF, approvers: DEFAULT_STAFF },
+      config
+    );
   }
 
   // 8. EXPENSES
@@ -504,6 +543,12 @@ export async function handleCloudFallback(
     if (pathname === '/settings/business') {
       return mockResponse(DEFAULT_BUSINESS, config);
     }
+    if (pathname.includes('orders_layout')) {
+      return mockResponse({ setting: { key: 'orders_layout', value: 'split' } }, config);
+    }
+    if (pathname.includes('product-analytics')) {
+      return mockResponse({ setting: { key: 'product-analytics', value: 'off' } }, config);
+    }
     if (pathname === '/settings/kds_enabled') {
       return mockResponse({ setting: { key: 'kds_enabled', value: 'true' } }, config);
     }
@@ -540,12 +585,21 @@ export async function handleCloudFallback(
     return mockResponse({ success: true, setting: { value: null } }, config);
   }
 
-  // 12. KDS / STATIONS
-  if (pathname.startsWith('/kitchen-stations') || pathname.startsWith('/kds-info')) {
+  // 12. KDS / STATIONS / DEVICE INFO
+  if (
+    pathname.startsWith('/kitchen-stations') ||
+    pathname.startsWith('/kds-info') ||
+    pathname.startsWith('/server-app-info') ||
+    pathname.startsWith('/pos-info')
+  ) {
     return mockResponse(
       {
         enabled: true,
         stations: [{ id: 1, name: 'Kitchen Station', is_active: true }],
+        mdns_url: '',
+        ip_url: '',
+        qr_url: '',
+        qr_data_url: null,
       },
       config
     );
