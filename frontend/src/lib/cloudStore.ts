@@ -295,6 +295,16 @@ export async function handleCloudFallback(
     return mockResponse(null, config);
   }
 
+  // AUTH & SETUP STATUS
+  if (pathname.startsWith('/auth/setup')) {
+    if (pathname.includes('/status')) {
+      return mockResponse({ needsSetup: false, masterPinAvailable: true }, config);
+    }
+    if (pathname.includes('/initialize')) {
+      return mockResponse({ success: true, message: 'Setup completed successfully' }, config);
+    }
+  }
+
   // 1. ORDERS
   if (pathname === '/orders' || pathname.startsWith('/orders/')) {
     if (method === 'get') {
@@ -377,11 +387,41 @@ export async function handleCloudFallback(
 
       const orderNumber =
         body.order_number || `AP-${Math.floor(1000 + Math.random() * 9000)}`;
-      const total = Number(body.total) || 0;
-      const subtotal = Number(body.subtotal || body.total) || total;
+      const orderId = Date.now();
+
+      const storedProducts = getStored<Product[]>('products', DEFAULT_PRODUCTS);
+      const productMap = new Map(storedProducts.map((p) => [p.id, p]));
+
+      let calculatedSubtotal = 0;
+      const rawItems = Array.isArray(body.items) ? body.items : [];
+      const mappedItems = rawItems.map((rawItem: any, idx: number) => {
+        const prod = productMap.get(rawItem.product_id);
+        const unitPrice = Number(rawItem.price_override?.price ?? prod?.price ?? 0);
+        const qty = Number(rawItem.quantity) || 1;
+        const itemTotal = unitPrice * qty;
+        calculatedSubtotal += itemTotal;
+        return {
+          id: orderId + idx + 1,
+          order_id: orderId,
+          product_id: rawItem.product_id,
+          product_name: prod?.name || 'Pancake Item',
+          product_sku: prod?.sku || null,
+          unit_price: unitPrice,
+          quantity: qty,
+          subtotal: itemTotal,
+          tax_amount: 0,
+          total: itemTotal,
+          addons: rawItem.addons || null,
+          special_instructions: rawItem.special_instructions || null,
+          status: 'pending' as const,
+        };
+      });
+
+      const subtotal = Number(body.subtotal) || calculatedSubtotal || Number(body.total) || 0;
+      const total = Number(body.total) || subtotal;
 
       const newOrder: Order = {
-        id: Date.now(),
+        id: orderId,
         order_number: orderNumber,
         type: body.type || 'dine_in',
         status: 'pending',
@@ -397,8 +437,8 @@ export async function handleCloudFallback(
         created_at: new Date().toISOString(),
         table_id: body.table_id || null,
         customer_id: body.customer_id || null,
-        items: body.items || [],
-        bill: makeBill(Date.now(), orderNumber, total, new Date().toISOString()),
+        items: mappedItems,
+        bill: makeBill(orderId, orderNumber, total, new Date().toISOString()),
       };
 
       const existing = getStored<Order[]>('orders', []);
@@ -530,12 +570,21 @@ export async function handleCloudFallback(
     if (pathname.includes('/print-history')) {
       return mockResponse({ prints: [] }, config);
     }
-    return mockResponse(
-      {
-        bill: makeBill(Date.now(), 'AP-101', 0, new Date().toISOString()),
-      },
-      config
-    );
+    let body: any = {};
+    try {
+      body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data || {};
+    } catch {
+      body = {};
+    }
+    const orderId = body.order_id || Date.now();
+    const existingOrders = getStored<Order[]>('orders', []);
+    const matchingOrder = existingOrders.find((o) => o.id === orderId);
+    const billTotal = matchingOrder ? matchingOrder.total : 0;
+    const billOrderNumber = matchingOrder
+      ? matchingOrder.order_number
+      : `AP-${Math.floor(1000 + Math.random() * 9000)}`;
+    const bill = makeBill(Number(orderId) || Date.now(), billOrderNumber, billTotal, new Date().toISOString());
+    return mockResponse({ bill }, config);
   }
 
   // 11. SETTINGS

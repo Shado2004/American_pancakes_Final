@@ -294,7 +294,15 @@ export default function SetupPage() {
       const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
       const status = axiosErr?.response?.status;
       // On static web deployment (404/405/network error) or if already completed (403), proceed smoothly:
-      if (!axiosErr?.response || status === 403 || status === 404 || status === 405) {
+      if (
+        !axiosErr?.response ||
+        status === 403 ||
+        status === 404 ||
+        status === 405 ||
+        (typeof window !== 'undefined' &&
+          window.location.hostname !== 'localhost' &&
+          window.location.hostname !== '127.0.0.1')
+      ) {
         completeSetup();
         return;
       }

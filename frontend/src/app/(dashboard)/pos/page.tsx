@@ -20,6 +20,7 @@ import type {
   CartItem,
 } from '@/lib/types';
 import { cartItemToOrderItem } from '@/lib/cart-order-item';
+import { isStaticCloudHost } from '@/lib/cloudStore';
 import { useConfirm } from '@/hooks/use-confirm';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 
@@ -1819,28 +1820,32 @@ export default function POSPage() {
           priorOrderAttempt.fingerprint === cartFingerprint
         ) {
           const completedOrder = priorOrderAttempt.order;
-          reportOrderFailure({
-            code: completedOrder ? 'order.retry_state.cleanup_failed' : 'order.retry_state.pending',
-            title: completedOrder
-              ? t('orderPlaced', { number: completedOrder.order_number })
-              : t('placeOrderFailed'),
-            message: completedOrder ? t('saleCompleteCleanupFailed') : t('operationOutcomeUnknown'),
-            nextStep: completedOrder
-              ? t('saleCompleteCheckOrders')
-              : t('operationCheckBeforeRetry'),
-            detail: completedOrder
-              ? 'This matching order attempt already has a confirmed order and cannot be reused for a new sale'
-              : 'A send-to-payment attempt for this cart is unresolved and cannot be replaced with a different checkout request',
-            status: null,
-            operation: 'order.create',
-            stage: completedOrder ? 'cleanup' : 'retry_state',
-            outcome: completedOrder ? 'applied' : 'unknown',
-            reasonCode: completedOrder
-              ? 'order.retry_state.cleanup_failed'
-              : 'order.retry_state.pending',
-            correlationId: priorOrderAttempt.operationId,
-          });
-          return;
+          if (!completedOrder && isStaticCloudHost()) {
+            clearPostpaidAttempt(originUserId);
+          } else {
+            reportOrderFailure({
+              code: completedOrder ? 'order.retry_state.cleanup_failed' : 'order.retry_state.pending',
+              title: completedOrder
+                ? t('orderPlaced', { number: completedOrder.order_number })
+                : t('placeOrderFailed'),
+              message: completedOrder ? t('saleCompleteCleanupFailed') : t('operationOutcomeUnknown'),
+              nextStep: completedOrder
+                ? t('saleCompleteCheckOrders')
+                : t('operationCheckBeforeRetry'),
+              detail: completedOrder
+                ? 'This matching order attempt already has a confirmed order and cannot be reused for a new sale'
+                : 'A send-to-payment attempt for this cart is unresolved and cannot be replaced with a different checkout request',
+              status: null,
+              operation: 'order.create',
+              stage: completedOrder ? 'cleanup' : 'retry_state',
+              outcome: completedOrder ? 'applied' : 'unknown',
+              reasonCode: completedOrder
+                ? 'order.retry_state.cleanup_failed'
+                : 'order.retry_state.pending',
+              correlationId: priorOrderAttempt.operationId,
+            });
+            return;
+          }
         }
         if (
           priorOrderAttempt?.userId === originUserId &&
@@ -3622,8 +3627,12 @@ export default function POSPage() {
                   </button>
                 ))}
                 <button
-                  className="rounded border px-3 py-2 text-sm"
-                  onClick={() => setSupportError(null)}
+                  className="rounded border px-3 py-2 text-sm cursor-pointer"
+                  onClick={() => {
+                    setSupportError(null);
+                    clearPostpaidAttempt(activeUserId);
+                    clearPrepaidAttempt(activeUserId);
+                  }}
                 >
                   {tSupport('dismiss')}
                 </button>
