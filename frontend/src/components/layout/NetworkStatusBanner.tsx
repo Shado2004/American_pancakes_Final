@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { WifiOff, RefreshCw, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 
 export default function NetworkStatusBanner() {
-  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [isOnline, setIsOnline] = useState<boolean>(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true,
+  );
   const [isBuffering, setIsBuffering] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [isMinimized, setIsMinimized] = useState<boolean>(false);
@@ -16,6 +18,17 @@ export default function NetworkStatusBanner() {
     if (!navigator.onLine) {
       setIsOnline(false);
       setIsBuffering(false);
+      return;
+    }
+
+    const isCloudOrStatic =
+      typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1';
+
+    if (isCloudOrStatic) {
+      setIsBuffering(false);
+      setIsOnline(navigator.onLine);
       return;
     }
 
@@ -57,8 +70,6 @@ export default function NetworkStatusBanner() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    setIsOnline(navigator.onLine);
 
     const handleOnline = () => {
       void checkConnectivity();

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[6385],{16385:(e,u,l)=>{l.d(u,{getSupabaseClient:()=>s});var n=l(8171);let t=null;function s(){return null}}}]);
